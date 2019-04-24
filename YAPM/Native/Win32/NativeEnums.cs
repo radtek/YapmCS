@@ -1073,6 +1073,7 @@ namespace Native.Api
 
         // OK
 
+        [Flags]
         public enum ServiceAccept : uint
         {
             NetBindChange = 0x10,

@@ -417,6 +417,7 @@ namespace Native.Api
             ServiceAlreadyPaused = 24
         }
 
+        [Flags]
         public enum WmiShutdownValues : int
         {
             LogOff = 0,

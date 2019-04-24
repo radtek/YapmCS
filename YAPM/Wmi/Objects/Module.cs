@@ -6,9 +6,6 @@ namespace Wmi.Objects
 {
     public class Module
     {
-
-
-
         // ========================================
         // Private constants
         // ========================================
@@ -24,9 +21,10 @@ namespace Wmi.Objects
         // ========================================
 
         // Enumerate modules
-        public static bool EnumerateModuleById(int pid, System.Management.ManagementObjectSearcher objSearcher, ref Dictionary<string, moduleInfos> _dico, ref string errMsg)
+        public static bool EnumerateModuleById(int pid, ManagementObjectSearcher objSearcher,
+            ref Dictionary<string, moduleInfos> dico, ref string errMsg)
         {
-            ManagementObjectCollection res = null;
+            ManagementObjectCollection res;
             try
             {
                 res = objSearcher.Get();
@@ -55,34 +53,35 @@ namespace Wmi.Objects
             // Next
             // Next
 
-            foreach (System.Management.ManagementObject refProcess in res)
+            foreach (var managementBaseObject in res)
             {
-                int aPid = System.Convert.ToInt32(refProcess.GetPropertyValue(Native.Api.Enums.WmiInfoProcess.ProcessId.ToString()));
+                var refProcess = (ManagementObject) managementBaseObject;
+                var aPid = Convert.ToInt32(
+                    refProcess.GetPropertyValue(Native.Api.Enums.WmiInfoProcess.ProcessId.ToString()));
 
                 // OK, we get modules for this process
-                if (pid == aPid)
+                if (pid != aPid) continue;
+                var colModule = refProcess.GetRelated("CIM_DataFile");
+                foreach (var o in colModule)
                 {
-                    ManagementObjectCollection colModule = refProcess.GetRelated("CIM_DataFile");
-                    foreach (ManagementObject refModule in colModule)
+                    var refModule = (ManagementObject) o;
+                    var obj =
+                        new Native.Api.NativeStructs.LdrDataTableEntry();
+                    var path = Convert.ToString(refModule.GetPropertyValue("Name"));
+
                     {
-                        Native.Api.NativeStructs.LdrDataTableEntry obj = new Native.Api.NativeStructs.LdrDataTableEntry();
-                        string path = System.Convert.ToString(refModule.GetPropertyValue("Name"));
-
-                        {
-                            var withBlock = obj;
-                            // Get base address from dico
-                            // TOCHANGE
-                            withBlock.DllBase = IntPtr.Zero;
-                            withBlock.EntryPoint = IntPtr.Zero;
-                            withBlock.SizeOfImage = 0;
-                        }
-
-                        string _manuf = System.Convert.ToString(refModule.GetPropertyValue("Manufacturer"));
-                        string _vers = System.Convert.ToString(refModule.GetPropertyValue("Version"));
-                        moduleInfos _module = new moduleInfos(ref obj, aPid, path, _vers, _manuf);
-                        string _key = path + "-" + pid.ToString() + "-" + obj.DllBase.ToString();
-                        _dico.Add(_key, _module);
+                        // Get base address from dico
+                        // TOCHANGE
+                        obj.DllBase = IntPtr.Zero;
+                        obj.EntryPoint = IntPtr.Zero;
+                        obj.SizeOfImage = 0;
                     }
+
+                    var manuf = Convert.ToString(refModule.GetPropertyValue("Manufacturer"));
+                    var vers = Convert.ToString(refModule.GetPropertyValue("Version"));
+                    var module = new moduleInfos(ref obj, aPid, path, vers, manuf);
+                    var key = path + "-" + pid + "-" + obj.DllBase;
+                    dico.Add(key, module);
                 }
             }
 
@@ -90,4 +89,3 @@ namespace Wmi.Objects
         }
     }
 }
-

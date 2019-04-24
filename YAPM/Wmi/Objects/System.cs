@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Management;
+using Native.Api;
 
 namespace Wmi.Objects
 {
@@ -22,50 +23,61 @@ namespace Wmi.Objects
         // ========================================
 
         // Shutdown remote pc
-        public static bool ShutdownRemoteComputer(Native.Api.Enums.ShutdownType type, bool force, System.Management.ManagementObjectSearcher objSearcher, ref string msgError)
+        public static bool ShutdownRemoteComputer(Enums.ShutdownType type, bool force, ManagementObjectSearcher objSearcher, ref string msgError)
         {
+            if (msgError == null) throw new ArgumentNullException(nameof(msgError));
             try
             {
-                Native.Api.Enums.WBEMStatus res;
-                Native.Api.Enums.WmiShutdownValues param;
+                var res = Enums.WBEMStatus.WBEM_NO_ERROR;
+                var param = Enums.WmiShutdownValues.LogOff;
                 if (force)
-                    param = param | Native.Api.Enums.WmiShutdownValues.Force;
+                    param |= Enums.WmiShutdownValues.Force;
                 switch (type)
                 {
-                    case Native.Api.Enums.ShutdownType.Logoff:
+                    case Enums.ShutdownType.Logoff:
                         {
-                            param = param | Native.Api.Enums.WmiShutdownValues.LogOff;
+                            param |= Enums.WmiShutdownValues.LogOff;
                             break;
                         }
 
-                    case Native.Api.Enums.ShutdownType.Poweroff:
+                    case Enums.ShutdownType.Poweroff:
                         {
-                            param = param | Native.Api.Enums.WmiShutdownValues.PowerOff;
+                            param |= Enums.WmiShutdownValues.PowerOff;
                             break;
                         }
 
-                    case Native.Api.Enums.ShutdownType.Restart:
+                    case Enums.ShutdownType.Restart:
                         {
-                            param = param | Native.Api.Enums.WmiShutdownValues.Reboot;
+                            param |= Enums.WmiShutdownValues.Reboot;
                             break;
                         }
 
-                    case Native.Api.Enums.ShutdownType.Shutdown:
+                    case Enums.ShutdownType.Shutdown:
                         {
-                            param = param | Native.Api.Enums.WmiShutdownValues.Shutdown;
+                            param |= Enums.WmiShutdownValues.Shutdown;
                             break;
                         }
+
+                    case Enums.ShutdownType.Sleep:
+                        break;
+                    case Enums.ShutdownType.Hibernate:
+                        break;
+                    case Enums.ShutdownType.Lock:
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(type), type, null);
                 }
-                object[] obj = new object[1];
-                obj[0] = (object)param;
-                foreach (ManagementObject osObj in objSearcher.Get())
+                var obj = new object[1];
+                obj[0] = param;
+                foreach (var o in objSearcher.Get())
                 {
-                    res = (Native.Api.Enums.WBEMStatus)osObj.InvokeMethod("Win32Shutdown", obj);
+                    var osObj = (ManagementObject) o;
+                    res = (Enums.WBEMStatus)osObj.InvokeMethod("Win32Shutdown", obj);
                     break;
                 }
 
                 msgError = res.ToString();
-                return (res == Native.Api.Enums.WBEMStatus.WBEM_NO_ERROR);
+                return res == Enums.WBEMStatus.WBEM_NO_ERROR;
             }
             catch (Exception ex)
             {

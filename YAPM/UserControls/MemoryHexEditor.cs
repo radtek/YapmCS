@@ -22,46 +22,37 @@
 using System.Drawing;
 using System.Diagnostics;
 using System.Windows.Forms;
-using Microsoft.VisualBasic;
-using Common;
-using System.Xml;
-using System.Collections.Generic;
-using System.Collections;
 using System;
-using Microsoft.Samples;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-public partial class MemoryHexEditor : System.Windows.Forms.Control
+public partial class MemoryHexEditor
 {
-    MemoryHexEditor()
+    private MemoryHexEditor(IContainer components)
     {
+        this.components = components;
         _vs = new VScrollBar();
     }
 
     [DllImport("user32.dll", SetLastError = true)]
-    public static bool CreateCaret(IntPtr hWnd, IntPtr hBitmap, int nWidth, int nHeight)
-    {
-    }
+    public static extern bool CreateCaret(IntPtr hWnd, IntPtr hBitmap, int nWidth, int nHeight);
 
     [DllImport("user32.dll", SetLastError = true)]
-    public static bool ShowCaret(IntPtr hWnd)
-    {
-    }
+    public static extern bool ShowCaret(IntPtr hWnd);
+
 
     [DllImport("user32.dll", SetLastError = true)]
-    public static bool DestroyCaret()
-    {
-    }
+    public static extern bool DestroyCaret();
+
 
     [DllImport("user32.dll", SetLastError = true)]
-    public static bool SetCaretPos(int X, int Y)
-    {
-    }
+    public static extern bool SetCaretPos(int X, int Y);
+
 
     [DllImport("user32.dll", SetLastError = true)]
-    private static int InvertRect(IntPtr hdc, ref RECT lpRect)
-    {
-    }
+    private static extern int InvertRect(IntPtr hdc, ref RECT lpRect);
+
 
     [StructLayout(LayoutKind.Sequential)]
     private struct RECT
@@ -123,11 +114,11 @@ public partial class MemoryHexEditor : System.Windows.Forms.Control
     private int _linesNumber;
 
     // Colors
-    private Color _OffsetColor = Color.Black;
-    private Color _HValuesColor = Color.Blue;
-    private Color _SValuesColor = Color.Red;
-    private Color _SelectionColor = Color.AliceBlue;
-    private Color _LineColor = Color.DarkGray;
+    private static Color _OffsetColor = Color.Black;
+    private static Color _HValuesColor = Color.Blue;
+    private static Color _SValuesColor = Color.Red;
+    private static Color _SelectionColor = Color.AliceBlue;
+    private static Color _LineColor = Color.DarkGray;
 
     // Pens
     private Pen _HValuesPen = new Pen(_HValuesColor);
@@ -167,7 +158,7 @@ public partial class MemoryHexEditor : System.Windows.Forms.Control
     private int _xOld;
     private int _yOld;
     private bool _ShiftDown = false;
-
+    private bool shitD;
 
 
     // ========================================
@@ -236,7 +227,7 @@ public partial class MemoryHexEditor : System.Windows.Forms.Control
         // InitializeComponent()
         SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
 
-        this.Width = CONTROL_WIDTH;
+        Width = CONTROL_WIDTH;
         // CHAR_HEIGHT = CInt(Me.CreateGraphics.MeasureString("0", _font, 0).Height)
 
         _pid = ProcessId;
@@ -254,26 +245,27 @@ public partial class MemoryHexEditor : System.Windows.Forms.Control
             withBlock.LargeChange = System.Convert.ToInt32(withBlock.Maximum / (double)30 + 1);
             withBlock.Top = 0;
             withBlock.Width = 20;
-            withBlock.Height = this.Height;
-            withBlock.Left = this.Width - withBlock.Width;
-            this.Controls.Add(_vs);
+            withBlock.Height = Height;
+            withBlock.Left = Width - withBlock.Width;
+            Controls.Add(_vs);
         }
 
         // Initialize caret
-        CreateCaret(this.Handle, IntPtr.Zero, 1, CHAR_HEIGHT);
-        this.UpdateCaretPosition();
+        CreateCaret(Handle, IntPtr.Zero, 1, CHAR_HEIGHT);
+        UpdateCaretPosition();
         _xOld = 1;
         _yOld = 1;
-        ShowCaret(this.Handle);
+        ShowCaret(Handle);
     }
 
     protected override void OnPaint(System.Windows.Forms.PaintEventArgs pe)
     {
         base.OnPaint(pe);
 
-        DrawOffset(ref pe.Graphics);
-        DrawValues(ref pe.Graphics);
-        DrawSelection(ref pe.Graphics);
+        var peGraphics = pe.Graphics;
+        DrawOffset(ref peGraphics);
+        DrawValues(ref peGraphics);
+        DrawSelection(ref peGraphics);
     }
 
 
@@ -444,8 +436,8 @@ public partial class MemoryHexEditor : System.Windows.Forms.Control
             g.DrawString(FormatedOffset(_memRegion.BeginningAddress.Increment((_vs.Value + x) * 16)), _font, _OffsetBrush, LEFT_OFFSET, TOP_OFFSET + x * LINE_HEIGHT);
 
         // Draw 2 lines
-        g.DrawLine(_LinePen, LEFT_FIRST_LINE, 0, LEFT_FIRST_LINE, this.Height);
-        g.DrawLine(_LinePen, LEFT_SECOND_LINE, 0, LEFT_SECOND_LINE, this.Height);
+        g.DrawLine(_LinePen, LEFT_FIRST_LINE, 0, LEFT_FIRST_LINE, Height);
+        g.DrawLine(_LinePen, LEFT_SECOND_LINE, 0, LEFT_SECOND_LINE, Height);
     }
 
     // Draw values read in memory
@@ -607,7 +599,7 @@ Input:
         ReCalcX(e.X);
         ReCalcY(e.Y);
 
-        this.Refresh();
+        Refresh();
     }
 
     protected override void OnMouseWheel(System.Windows.Forms.MouseEventArgs e)
@@ -670,7 +662,7 @@ Input:
 
         Trace.WriteLine("old=" + _xOld + " new=" + _xCar);
 
-        this.Refresh();
+        Refresh();
     }
 
     protected override void OnKeyUp(System.Windows.Forms.KeyEventArgs e)
@@ -778,7 +770,7 @@ Input:
 
 
         if (e.Shift)
-            this.Refresh();
+            Refresh();
         else
         {
             _xOld = _xCar;
@@ -791,15 +783,15 @@ Input:
     protected override void OnResize(System.EventArgs e)
     {
         base.OnResize(e);
-        _vs.Height = this.Height;
-        _linesNumber = System.Convert.ToInt32((this.Height - TOP_OFFSET) / (double)CHAR_HEIGHT);  // Calculate number of lines to display
-        this.Refresh();
+        _vs.Height = Height;
+        _linesNumber = System.Convert.ToInt32((Height - TOP_OFFSET) / (double)CHAR_HEIGHT);  // Calculate number of lines to display
+        Refresh();
     }
 
     private void _vs_ValueChanged(object sender, System.EventArgs e)
     {
         _curViewDeb = _memRegion.BeginningAddress.Increment(_vs.Value * 16);  // Calculate first address
-        this.Refresh();
+        Refresh();
     }
 }
 

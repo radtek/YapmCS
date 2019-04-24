@@ -1,4 +1,4 @@
-﻿[global::Microsoft.VisualBasic.CompilerServices.DesignerGenerated()]
+﻿
 partial class MemoryHexEditor : System.Windows.Forms.Control
 {
 

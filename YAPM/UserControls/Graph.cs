@@ -450,7 +450,7 @@ public class Graph : System.Windows.Forms.PictureBox
             g.DrawRectangle(Pens.WhiteSmoke, _zoomRect);
 
         // Calcule current value
-        long _mouseCurrentValue;
+        long _mouseCurrentValue = 0;
         int h;
         if (_values != null)
         {

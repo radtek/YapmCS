@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Collections;
 using System;
 using Microsoft.Samples;
+using System.Runtime.CompilerServices;
 
 [global::Microsoft.VisualBasic.CompilerServices.DesignerGenerated()]
 partial class HKeyProp : HXXXProp

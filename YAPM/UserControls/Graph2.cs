@@ -28,10 +28,11 @@ using System.Xml;
 using System.Collections.Generic;
 using System.Collections;
 using System;
+using System.Runtime.CompilerServices;
 using Microsoft.Samples;
-using System.Windows.Forms.PictureBox;
+using static System.Windows.Forms.PictureBox;
 
-public class Graph2 : System.Windows.Forms.PictureBox
+public class Graph2 : PictureBox
 {
 
     // ========================================
@@ -40,11 +41,11 @@ public class Graph2 : System.Windows.Forms.PictureBox
     private int _gridStep = 13;
     private double[] _values;
     private double[] _values2;
-    private System.Drawing.Pen _colorGrid = Pens.DarkGreen;
-    private System.Drawing.Pen _color = Pens.Yellow;
-    private System.Drawing.Pen _color2 = Pens.Yellow;
-    private System.Drawing.Pen _color3 = Pens.Red;
-    private System.Drawing.Pen _textColor = Pens.Lime;
+    private static Pen _colorGrid = Pens.DarkGreen;
+    private static Pen _color = Pens.Yellow;
+    private static Pen _color2 = Pens.Yellow;
+    private static Pen _color3 = Pens.Red;
+    private static Pen _textColor = Pens.Lime;
     private bool _enableGraph;
     private int _mouseY;
     private int _mouseX;
@@ -59,9 +60,9 @@ public class Graph2 : System.Windows.Forms.PictureBox
 
     private int numberOfValuesDisplayed;
     private int numberOfValuesHidden;
-    private System.Windows.Forms.ToolTip _toolTip;
+    private ToolTip _toolTip;
 
-    private System.Windows.Forms.ToolTip toolTip
+    private ToolTip toolTip
     {
         [MethodImpl(MethodImplOptions.Synchronized)]
         get
@@ -86,11 +87,11 @@ public class Graph2 : System.Windows.Forms.PictureBox
     private System.ComponentModel.IContainer components;
     private double _yMaxValue = 0;
 
-    private System.Drawing.Pen _colorGridEn = _colorGrid;
-    private System.Drawing.Pen _colorEn = _color;
-    private System.Drawing.Pen _color2En = _color2;
-    private System.Drawing.Pen _color3En = _color3;
-    private System.Drawing.Pen _textColorEn = _textColor;
+    private Pen _colorGridEn = _colorGrid;
+    private Pen _colorEn = _color;
+    private Pen _color2En = _color2;
+    private Pen _color3En = _color3;
+    private Pen _textColorEn = _textColor;
 
     // ========================================
     // Properties
@@ -115,7 +116,7 @@ public class Graph2 : System.Windows.Forms.PictureBox
                 _color3 = Pens.Gray;
                 _colorGrid = Pens.DarkGray;
                 _textColor = Pens.DarkGray;
-                this.BackColor = System.Drawing.Color.Gray;
+                this.BackColor = Color.Gray;
             }
             else
             {
@@ -124,7 +125,7 @@ public class Graph2 : System.Windows.Forms.PictureBox
                 _color3 = _color3En;
                 _textColor = _textColorEn;
                 _colorGrid = _colorGridEn;
-                this.BackColor = System.Drawing.Color.Black;
+                this.BackColor = Color.Black;
             }
         }
     }
@@ -279,7 +280,7 @@ public class Graph2 : System.Windows.Forms.PictureBox
         _values2 = new double[201];
         this.toolTip = new ToolTip();
     }
-    protected override void OnPaint(System.Windows.Forms.PaintEventArgs e)
+    protected override void OnPaint(PaintEventArgs e)
     {
         base.OnPaint(e);
         DrawValuesDown(e.Graphics);
@@ -302,7 +303,7 @@ public class Graph2 : System.Windows.Forms.PictureBox
             }
         }
     }
-    protected override void OnMouseMove(System.Windows.Forms.MouseEventArgs e)
+    protected override void OnMouseMove(MouseEventArgs e)
     {
         base.OnMouseMove(e);
         _mouseX = e.X;
@@ -317,20 +318,20 @@ public class Graph2 : System.Windows.Forms.PictureBox
         _mouseLoc = e.Location;
         ShowToolTip();
     }
-    protected override void OnResize(System.EventArgs e)
+    protected override void OnResize(EventArgs e)
     {
         base.OnResize(e);
         _xMin = Math.Max(_xMax - this.Width, 0);
         numberOfValuesDisplayed = this.Width / 2;
-        numberOfValuesHidden = System.Convert.ToInt32(nCount - numberOfValuesDisplayed);
+        numberOfValuesHidden = Convert.ToInt32(nCount - numberOfValuesDisplayed);
     }
-    protected override void OnMouseLeave(System.EventArgs e)
+    protected override void OnMouseLeave(EventArgs e)
     {
         base.OnMouseLeave(e);
         _showToolTip = false;
         this.toolTip.Hide(this);
     }
-    protected override void OnMouseEnter(System.EventArgs e)
+    protected override void OnMouseEnter(EventArgs e)
     {
         base.OnMouseEnter(e);
         _showToolTip = true;
@@ -374,7 +375,7 @@ public class Graph2 : System.Windows.Forms.PictureBox
             SizeF sz = g.MeasureString(_text, this.Font);
             float textW = sz.Width + 4;
             float textH = sz.Height + 4;
-            g.FillRectangle(new SolidBrush(System.Drawing.Color.Black), new Rectangle(0, 0, System.Convert.ToInt32(textW), System.Convert.ToInt32(textH)));
+            g.FillRectangle(new SolidBrush(Color.Black), new Rectangle(0, 0, Convert.ToInt32(textW), Convert.ToInt32(textH)));
             // Draw the text
             TextRenderer.DrawText(g, _text, this.Font, new Point(2, 2), _textColor.Color);
         }
@@ -407,8 +408,8 @@ public class Graph2 : System.Windows.Forms.PictureBox
         // Now draw lines (upper lines)
         for (x = _xMax; x >= loopTo; x += -1)
         {
-            newPxlX = System.Convert.ToInt32((x - numberOfValuesHidden) * _xCoeff);
-            newPxlY = System.Convert.ToInt32(this.Height - _values2[x] * _yCoeff) - 2;
+            newPxlX = Convert.ToInt32((x - numberOfValuesHidden) * _xCoeff);
+            newPxlY = Convert.ToInt32(this.Height - _values2[x] * _yCoeff) - 2;
 
             // If first line, old = new
             if (x == _xMax)
@@ -453,8 +454,8 @@ public class Graph2 : System.Windows.Forms.PictureBox
         // Now draw lines (upper lines)
         for (x = _xMax; x >= loopTo; x += -1)
         {
-            newPxlX = System.Convert.ToInt32((x - numberOfValuesHidden) * _xCoeff);
-            newPxlY = System.Convert.ToInt32(this.Height - _values[x] * _yCoeff) - 2;
+            newPxlX = Convert.ToInt32((x - numberOfValuesHidden) * _xCoeff);
+            newPxlY = Convert.ToInt32(this.Height - _values[x] * _yCoeff) - 2;
 
             // If first line, old = new
             if (x == _xMax)
@@ -506,8 +507,8 @@ public class Graph2 : System.Windows.Forms.PictureBox
         // Now draw lines (lower lines)
         for (x = _xMax; x >= loopTo1; x += -1)
         {
-            newPxlX = System.Convert.ToInt32((x - numberOfValuesHidden) * _xCoeff);
-            newPxlY = System.Convert.ToInt32(this.Height - _values[x] * _yCoeff) - 2;
+            newPxlX = Convert.ToInt32((x - numberOfValuesHidden) * _xCoeff);
+            newPxlY = Convert.ToInt32(this.Height - _values[x] * _yCoeff) - 2;
 
             // If first line, old = new
             if (x == _xMax)
@@ -533,7 +534,7 @@ public class Graph2 : System.Windows.Forms.PictureBox
 
     public void AddValue(int value)
     {
-        AddValue(System.Convert.ToDouble(value));
+        AddValue(Convert.ToDouble(value));
     }
     public void AddValue(double value)
     {
@@ -550,15 +551,15 @@ public class Graph2 : System.Windows.Forms.PictureBox
 
         // Calculate new xMin and xMax
         numberOfValuesDisplayed = this.Width / 2;
-        numberOfValuesHidden = System.Convert.ToInt32(nCount - numberOfValuesDisplayed);
+        numberOfValuesHidden = Convert.ToInt32(nCount - numberOfValuesDisplayed);
 
         _xMax = nCount - 1;      // Last item by default
-        _xMin = System.Convert.ToInt32(Math.Max(_xMax - numberOfValuesDisplayed, 0));
+        _xMin = Convert.ToInt32(Math.Max(_xMax - numberOfValuesDisplayed, 0));
     }
 
     public void Add2Values(int value1, int value2)
     {
-        Add2Values(System.Convert.ToDouble(value1), System.Convert.ToDouble(value2));
+        Add2Values(Convert.ToDouble(value1), Convert.ToDouble(value2));
     }
     public void Add2Values(double value1, double value2)
     {
@@ -579,10 +580,10 @@ public class Graph2 : System.Windows.Forms.PictureBox
 
         // Calculate new xMin and xMax
         numberOfValuesDisplayed = this.Width / 2;
-        numberOfValuesHidden = System.Convert.ToInt32(nCount - numberOfValuesDisplayed);
+        numberOfValuesHidden = Convert.ToInt32(nCount - numberOfValuesDisplayed);
 
         _xMax = nCount - 1;      // Last item by default
-        _xMin = System.Convert.ToInt32(Math.Max(_xMax - numberOfValuesDisplayed, 0));
+        _xMin = Convert.ToInt32(Math.Max(_xMax - numberOfValuesDisplayed, 0));
     }
 
     public void ClearValue()
@@ -595,7 +596,7 @@ public class Graph2 : System.Windows.Forms.PictureBox
     private void InitializeComponent()
     {
         this.components = new System.ComponentModel.Container();
-        this.toolTip = new System.Windows.Forms.ToolTip(this.components);
+        this.toolTip = new ToolTip(this.components);
         ((System.ComponentModel.ISupportInitialize)this).BeginInit();
         this.SuspendLayout();
         // 

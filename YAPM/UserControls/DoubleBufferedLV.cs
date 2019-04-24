@@ -136,7 +136,7 @@ public class DoubleBufferedLV : System.Windows.Forms.ListView
                             _s += Constants.vbNewLine;
                         x += 1;
                     }
-                    My.MyProject.Computer.Clipboard.SetText(_s);
+                    Clipboard.SetText(_s);
                 }
                 else
                 {
@@ -156,7 +156,7 @@ public class DoubleBufferedLV : System.Windows.Forms.ListView
                             _s += Constants.vbNewLine;
                         x += 1;
                     }
-                    My.MyProject.Computer.Clipboard.SetText(_s);
+                    Clipboard.SetText(_s);
                 }
             }
         }
